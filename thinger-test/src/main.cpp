@@ -27,13 +27,30 @@
 #define DEVICE_ID           "YOUR_DEVICE_ID"
 #define DEVICE_CREDENTIAL   "YOUR_DEVICE_CREDENTIAL"
 
+int random_number(int min_num, int max_num)
+{
+    int result = 0, low_num = 0, hi_num = 0;
+
+    if (min_num < max_num)
+    {
+        low_num = min_num;
+        hi_num = max_num + 1; // include max_num in output
+    } else {
+        low_num = max_num + 1; // include max_num in output
+        hi_num = min_num;
+    }
+
+    srand(time(NULL));
+    result = (rand() % (hi_num - low_num)) + low_num;
+    return result;
+}
+
 int main(int argc, char *argv[])
 {
     thinger_device thing(USER_ID, DEVICE_ID, DEVICE_CREDENTIAL);
 
-    // define thing resources here. i.e, this is a sum example
-    thing["sum"] = [](pson& in, pson& out){
-        out["result"] = (int) in["value1"] + (int) in["value2"];
+    thing["random"] >> [](pson& out){
+        out["result"] = (int) random_number(1, 100);
     };
 
     thing.start();
