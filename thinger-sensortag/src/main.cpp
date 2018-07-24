@@ -36,11 +36,11 @@
 
 using namespace std;
 
-#define USER_ID "xxx"
-#define DEVICE_ID "xxx"
-#define DEVICE_CREDENTIAL "xxx"
+#define USER_ID 			"xxx"
+#define DEVICE_ID 			"xxx"
+#define DEVICE_CREDENTIAL 	"xxx"
 
-#define SENSORTAG_CMD "python ./../sensortag/sensortagcollector.py -d C4:BE:84:70:F6:8B=sensorRed A0:E6:F8:AE:37:80=sensorYellow"
+#define SENSORTAG_CMD 		"python ./../../sensortag/sensortagcollector.py -d "
 
 class Load
 {
@@ -61,6 +61,19 @@ class Memory
     int swapFree;
 };
 
+class Sensor
+{
+  public:
+    float x;
+    float y;
+    float z;
+	// TODO add more data
+};
+
+map<string, Sensor> sensors;
+
+/// old
+
 class Accelerometer
 {
   public:
@@ -71,6 +84,8 @@ class Accelerometer
 
 Accelerometer sensorRedAccelerometer;
 Accelerometer sensorYellowAccelerometer;
+
+/// old end
 
 Load getLoad()
 {
@@ -200,8 +215,20 @@ void streamSensorTag(thinger_device thing)
     printf("SensorTag terminated\n");
 }
 
-int main(int argc, char *argv[])
+// Arguments are C4:BE:84:70:F6:8B=sensorRed A0:E6:F8:AE:37:80=sensorYellow
+int main(int argc, char* argv[])
 {
+	printf("argc: %i\n", argc);
+	
+	for(int i = 0; i < argc; ++i) {
+  		printf("argv %i: %s\n", i, argv[i]);
+	}
+	
+	if (argc < 2) {
+		printf("No arguments found, please use C4:BE:84:70:F6:8B=sensorRed A0:E6:F8:AE:37:80=sensorYellow or something like that\n");
+		exit(-1);
+	}
+	
     thinger_device thing(USER_ID, DEVICE_ID, DEVICE_CREDENTIAL);
 
     thing["load"] >> [](pson &out) {
@@ -223,6 +250,28 @@ int main(int argc, char *argv[])
         out["swapFree"] = m.swapFree;
     };
 
+	// register sensors
+	for(int i = 1; i < argc; ++i) {
+  		printf("Adding sensor %i: %s\n", i, argv[i]);
+		
+		char* pch;
+		static char* sensor;
+  		pch = strtok (argv[i], "=");
+		pch = strtok (NULL, "=");
+		
+		sensor = pch;
+		printf("%s\n", sensor);
+		Sensor s;
+		sensors[sensor] = s;
+		
+		thing[sensor] >> [](pson &out) {
+        	out["x"] = sensors[sensor].x;
+        	out["y"] = 2;//sensors[sensor].y;
+        	out["z"] = 3;//sensors[sensor].z;
+    	};
+	}
+	
+	
     thing["sensorRedAccelerometer"] >> [](pson &out) {
         out["x"] = sensorRedAccelerometer.x;
         out["y"] = sensorRedAccelerometer.y;
