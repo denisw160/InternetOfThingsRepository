@@ -1,4 +1,4 @@
-# Sketch
+# Repository for Internet Of Things
 
 Some sketches for IoT-enabled apps. 
 
