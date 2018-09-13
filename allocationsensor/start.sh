@@ -1,6 +1,11 @@
 #!/bin/bash
 #
-# This scripts starts the receiver for testing the communication.
+# This scripts starts the sender i for testing the communication.
 #
 
-python test/receiver.py
+SERVER=127.0.0.1
+PORT=1111
+STATION=TCS00001
+
+# ToDo Check possibilities to restart on error
+python src/allocationsensor.py ${SERVER} ${PORT} ${STATION}
