@@ -7,7 +7,6 @@ sudo apt update
 sudo apt upgrade
 sudo apt autoremove
 
-sudo apt-get install -y python-pip
-#sudo apt-get install -y python3-pip
+sudo apt-get install -y cmake
+sudo apt-get install -y libssl-dev
 
-sudo pip install PyCRC
