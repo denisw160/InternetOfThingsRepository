@@ -32,6 +32,19 @@ STATION = "TCS00000"
 DEBUG = False
 INTERVAL = 1
 
+
+# Functions
+
+def int2bytes(n):
+    b = bytearray([0, 0])  # init
+    b[1] = n & 0xFF
+    n >>= 8
+    b[0] = n & 0xFF
+
+    # Return the result as byte array
+    return b
+
+
 # Reading parameter from command line
 if len(sys.argv) < 4:
     print("Missing parameter, please use at least SERVER, PORT, STATION")
@@ -73,7 +86,7 @@ while True:
         print("checksum:", CHECKSUM)
         print("checksum (hex):", hex(CHECKSUM))
 
-    MESSAGE_AS_BYTES = MESSAGE_AS_BYTES + str.encode(str(CHECKSUM))
+    MESSAGE_AS_BYTES = MESSAGE_AS_BYTES + int2bytes(CHECKSUM)
 
     # Sending message
     sock = socket.socket(socket.AF_INET,  # Internet
