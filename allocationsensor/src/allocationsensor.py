@@ -1,5 +1,6 @@
 from PyCRC.CRCCCITT import CRCCCITT
 import RPi.GPIO as GPIO
+from random import randint
 import socket
 import sys
 import time
@@ -33,7 +34,11 @@ UDP_IP = "127.0.0.1"
 UDP_PORT = 1111
 STATION = "TCS00000"
 DEBUG = False
-INTERVAL = 1
+INTERVAL = 2
+
+ALLOCATED_SENSOR = 7  # GPIO 04
+STATUS_LED = 11  # GPIO 17
+ALLOCATED_LED = 13  # GPIO 27
 
 
 # Functions
@@ -46,6 +51,16 @@ def int2bytes(n):
 
     # Return the result as byte array
     return b
+
+
+def getsensordata():
+    # TODO implementation
+    # Example: http://raspberry.io/projects/view/reading-and-writing-from-gpio-ports-from-python/
+    r = randint(0, 9)
+    if r > 4:
+        return True
+    else:
+        return False
 
 
 # Reading parameter from command line
@@ -70,31 +85,58 @@ if DEBUG:
     print("Number of arguments:", len(sys.argv), "arguments.")
     print("Argument List:", str(sys.argv))
 
+# Setup GPIO layout
+GPIO.setmode(GPIO.BOARD)
+GPIO.setup(STATUS_LED, GPIO.OUT)  # Pin 11 (GPIO 17) as output
+GPIO.setup(ALLOCATED_LED, GPIO.OUT)  # Pin 13 (GPIO 27) as output
+
+# Activate on booting
+GPIO.output(STATUS_LED, GPIO.HIGH)
+GPIO.output(ALLOCATED_LED, GPIO.HIGH)
+
 # Running server
-while True:
-    # Reading state from GPIO port
-    # TODO implementation
-    # Example: http://raspberry.io/projects/view/reading-and-writing-from-gpio-ports-from-python/
-    ALLOCATED = True
-    ALLOCATED_AS_BYTE = b'0'
-    if ALLOCATED:
-        ALLOCATED_AS_BYTE = b'1'
+HEARTBEAT = False
+try:
+    while True:
+        # Toggle status led for heartbeat
+        HEARTBEAT = not HEARTBEAT
+        if HEARTBEAT:
+            GPIO.output(STATUS_LED, GPIO.HIGH)
+        else:
+            GPIO.output(STATUS_LED, GPIO.LOW)
 
-    # Building message
-    MESSAGE_AS_BYTES = str.encode(STATION) + ALLOCATED_AS_BYTE
-    CHECKSUM = CRCCCITT("FFFF").calculate(MESSAGE_AS_BYTES)
+        # Reading state from GPIO port
+        ALLOCATED = getsensordata()
+        ALLOCATED_AS_BYTE = b'0'
+        if ALLOCATED:
+            ALLOCATED_AS_BYTE = b'1'
+            GPIO.output(ALLOCATED_LED, GPIO.HIGH)
+        else:
+            GPIO.output(ALLOCATED_LED, GPIO.LOW)
 
+        # Building message
+        MESSAGE_AS_BYTES = str.encode(STATION) + ALLOCATED_AS_BYTE
+        CHECKSUM = CRCCCITT("FFFF").calculate(MESSAGE_AS_BYTES)
+
+        if DEBUG:
+            print("message:", MESSAGE_AS_BYTES)
+            print("checksum:", CHECKSUM)
+            print("checksum (hex):", hex(CHECKSUM))
+
+        # FixMe: perhaps a mistake in converting int to 2 bytes
+        MESSAGE_AS_BYTES = MESSAGE_AS_BYTES + int2bytes(CHECKSUM)
+
+        # Sending message
+        sock = socket.socket(socket.AF_INET,  # Internet
+                             socket.SOCK_DGRAM)  # UDP
+        sock.sendto(MESSAGE_AS_BYTES, (UDP_IP, UDP_PORT))
+
+        # wait for next update
+        time.sleep(INTERVAL)
+except KeyboardInterrupt:
     if DEBUG:
-        print("message:", MESSAGE_AS_BYTES)
-        print("checksum:", CHECKSUM)
-        print("checksum (hex):", hex(CHECKSUM))
-
-    MESSAGE_AS_BYTES = MESSAGE_AS_BYTES + int2bytes(CHECKSUM)  # FixMe: perhaps a mistake in converting int to 2 bytes
-
-    # Sending message
-    sock = socket.socket(socket.AF_INET,  # Internet
-                         socket.SOCK_DGRAM)  # UDP
-    sock.sendto(MESSAGE_AS_BYTES, (UDP_IP, UDP_PORT))
-
-    # wait for next update
-    time.sleep(INTERVAL)
+        print("Strg-C called")
+finally:
+    print("AllocationSensor stopped")
+    # Release GPIO ports
+    GPIO.cleanup()
