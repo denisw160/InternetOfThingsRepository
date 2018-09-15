@@ -10,4 +10,7 @@ sudo apt autoremove
 sudo apt-get install -y python-pip
 #sudo apt-get install -y python3-pip
 
+sudo apt-get install -y python-dev
+sudo apt-get install -y python-rpi.gpio
+
 sudo pip install PyCRC

@@ -1,4 +1,5 @@
 from PyCRC.CRCCCITT import CRCCCITT
+import RPi.GPIO as GPIO
 import socket
 import sys
 import time
@@ -21,8 +22,10 @@ import time
 # 8         1           boolean allocation state, 0 = open, 1 = occupied
 # 9         n           short   CRC16-CCINT for bytes 0 - 9
 #
-# require pip modules
-#  - PyCRC
+# require modules
+#  - PyCRC (pip)
+#  - python-dev + python-rpi.gpio (apt)
+#    or for development fakeRPiGPIO (pip)
 #
 
 # Default settings
@@ -86,7 +89,7 @@ while True:
         print("checksum:", CHECKSUM)
         print("checksum (hex):", hex(CHECKSUM))
 
-    MESSAGE_AS_BYTES = MESSAGE_AS_BYTES + int2bytes(CHECKSUM)
+    MESSAGE_AS_BYTES = MESSAGE_AS_BYTES + int2bytes(CHECKSUM)  # FixMe: perhaps a mistake in converting int to 2 bytes
 
     # Sending message
     sock = socket.socket(socket.AF_INET,  # Internet
