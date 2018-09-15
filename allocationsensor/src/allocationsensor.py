@@ -1,6 +1,5 @@
 from PyCRC.CRCCCITT import CRCCCITT
 import RPi.GPIO as GPIO
-from random import randint
 import socket
 import sys
 import time
@@ -34,7 +33,7 @@ UDP_IP = "127.0.0.1"
 UDP_PORT = 1111
 STATION = "TCS00000"
 DEBUG = False
-INTERVAL = 2
+INTERVAL = 1
 
 ALLOCATED_SENSOR = 7  # GPIO 04
 STATUS_LED = 11  # GPIO 17
@@ -54,10 +53,11 @@ def int2bytes(n):
 
 
 def getsensordata():
-    # TODO implementation
+    # Reading High/Low from sensor
     # Example: http://raspberry.io/projects/view/reading-and-writing-from-gpio-ports-from-python/
-    r = randint(0, 9)
-    if r > 4:
+    #          https://tutorials-raspberrypi.de/raspberry-pi-gpio-erklaerung-beginner-programmierung-lernen/
+    r = GPIO.input(ALLOCATED_SENSOR)
+    if r == 0:
         return True
     else:
         return False
@@ -89,6 +89,7 @@ if DEBUG:
 GPIO.setmode(GPIO.BOARD)
 GPIO.setup(STATUS_LED, GPIO.OUT)  # Pin 11 (GPIO 17) as output
 GPIO.setup(ALLOCATED_LED, GPIO.OUT)  # Pin 13 (GPIO 27) as output
+GPIO.setup(ALLOCATED_SENSOR, GPIO.IN)  # Pin 07 (GPIO 04) as input
 
 # Activate on booting
 GPIO.output(STATUS_LED, GPIO.HIGH)
