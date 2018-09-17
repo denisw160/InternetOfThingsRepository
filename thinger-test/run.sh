@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-mkdir -p build
+./build.sh
 cd build
-cmake -DCMAKE_BUILD_TYPE=Release -DDAEMON=OFF ../
-make thinger
 ./thinger
