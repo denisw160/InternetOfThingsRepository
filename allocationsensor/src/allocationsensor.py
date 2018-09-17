@@ -19,7 +19,7 @@ import time
 # Structure of the telegram
 # index     bytes       type    name
 # 0         8           string  TCSxxxxx
-# 8         1           boolean allocation state, 0 = open, 1 = occupied
+# 8         1           string  allocation state, 0 = open, 1 = occupied
 # 9         n           short   CRC16-CCINT for bytes 0 - 9
 #
 # require modules
@@ -108,15 +108,15 @@ try:
 
         # Reading state from GPIO port
         ALLOCATED = getsensordata()
-        ALLOCATED_AS_BYTE = b'0'
+        ALLOCATED_AS_STRING = "0"
         if ALLOCATED:
-            ALLOCATED_AS_BYTE = b'1'
+            ALLOCATED_AS_STRING = "1"
             GPIO.output(ALLOCATED_LED, GPIO.HIGH)
         else:
             GPIO.output(ALLOCATED_LED, GPIO.LOW)
 
         # Building message
-        MESSAGE_AS_BYTES = str.encode(STATION) + ALLOCATED_AS_BYTE
+        MESSAGE_AS_BYTES = str.encode(STATION) + str.encode(ALLOCATED_AS_STRING)
         CHECKSUM = CRCCCITT("FFFF").calculate(MESSAGE_AS_BYTES)
 
         if DEBUG:
