@@ -287,7 +287,7 @@ if not args.fast and not args.medium and not args.slow:
     # no setting specified - use the defaults
     args.medium = None
     args.slow = None
-    args.fast = ['accelerometer','lightmeter']
+    args.fast = ['accelerometer','lightmeter', 'humidity', 'barometer']
     
 if args.info:
     print args.fast
