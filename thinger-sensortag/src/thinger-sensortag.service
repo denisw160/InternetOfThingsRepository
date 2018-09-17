@@ -1,0 +1,20 @@
+# Service to execute the Thinger-Test
+#
+# Change the local path to thinger client if needed
+#
+
+[Unit]
+Description=Start the Thinger.io client as a gateway for the SensorTags
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=pi
+ExecStart=/home/pi/IoTRepository/thinger-sensortag/start.sh
+WorkingDirectory=/home/pi/IoTRepository/thinger-sensortag
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
