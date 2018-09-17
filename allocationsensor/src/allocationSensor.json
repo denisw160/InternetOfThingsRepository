@@ -1,0 +1,65 @@
+{
+  "shape": "<circle cx=\"10\" cy=\"10\" r=\"10\"/>",
+  "inputScript": "allocationSensorIn",
+  "outputScript": "allocationSensorOut",
+  "targetKey": "TCSAS",
+  "offsetProgress": {
+    "x": 0,
+    "y": 0
+  },
+  "minRangeOfSight": 0,
+  "size": {
+    "x": 100,
+    "y": 100
+  },
+  "responsibility": "DemoUser",
+  "offsetPivot": {
+    "x": 0,
+    "y": 0
+  },
+  "maxRangeOfSight": 0,
+  "offsetOdometry": {
+    "x": 30,
+    "y": 30
+  },
+  "id": "allocationSensor",
+  "actions": {
+    "NONE": {
+      "code": -1,
+      "minValue": 0,
+      "maxValue": 0,
+      "minTime": 0,
+      "maxTime": 0,
+      "samples": 0
+    },
+    "STOP": {
+      "code": 0,
+      "minValue": 0,
+      "maxValue": 0,
+      "minTime": 0,
+      "maxTime": 0,
+      "samples": 0
+    }
+  },
+  "errors": {},
+  "properties": {
+    "maxChunkSize": "640",
+    "maxSegConAngle": "30",
+    "useSegPosition": "true",
+    "useOdoPosition": "true",
+    "allowRemote": "true",
+    "avoidTraffic": "false",
+    "maxOfflinePeriod": "5000",
+    "allowUpdate": "true",
+    "coronaRadius": "auto",
+    "maxSpeed": "2"
+  },
+  "status": {
+    "allocated": {
+      "index": 64,
+      "length": 1,
+      "alert": -1,
+      "color": "green"
+    }
+  }
+}
