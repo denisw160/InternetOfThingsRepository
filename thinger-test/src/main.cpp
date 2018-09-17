@@ -23,9 +23,9 @@
 
 #include "thinger/thinger.h"
 
-#define USER_ID             "YOUR_USER_ID"
-#define DEVICE_ID           "YOUR_DEVICE_ID"
-#define DEVICE_CREDENTIAL   "YOUR_DEVICE_CREDENTIAL"
+#define USER_ID             "izb"
+#define DEVICE_ID           "demo"
+#define DEVICE_CREDENTIAL   "password"
 
 int random_number(int min_num, int max_num)
 {
