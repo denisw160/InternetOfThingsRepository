@@ -18,8 +18,8 @@ import time
 #
 # Structure of the telegram
 # index     bytes       type    name
-# 0         8           string  TCSxxxxx
-# 8         1           string  allocation state, 0 = open, 1 = occupied
+# 0         8           string  TCSASxxx
+# 8         1           bit     allocation state, 0 = open, 1 = occupied
 # 9         n           short   CRC16-CCINT for bytes 0 - 9
 #
 # require modules
@@ -31,7 +31,7 @@ import time
 # Default settings
 UDP_IP = "127.0.0.1"
 UDP_PORT = 1111
-STATION = "TCS00000"
+STATION = "TCSAS000"
 DEBUG = False
 INTERVAL = 1
 
@@ -108,9 +108,9 @@ try:
 
         # Reading state from GPIO port
         ALLOCATED = getsensordata()
-        ALLOCATED_AS_STRING = "0"
+        ALLOCATED_AS_STRING = "\x00"
         if ALLOCATED:
-            ALLOCATED_AS_STRING = "1"
+            ALLOCATED_AS_STRING = "\x01"
             GPIO.output(ALLOCATED_LED, GPIO.HIGH)
         else:
             GPIO.output(ALLOCATED_LED, GPIO.LOW)
