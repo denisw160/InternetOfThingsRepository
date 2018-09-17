@@ -1,8 +1,9 @@
 from PyCRC.CRCCCITT import CRCCCITT
 import RPi.GPIO as GPIO
+import time
+import signal
 import socket
 import sys
-import time
 
 #
 # This scripts starts the server and reads the status of the GPIO-port
@@ -38,6 +39,19 @@ INTERVAL = 1
 ALLOCATED_SENSOR = 7  # GPIO 04
 STATUS_LED = 11  # GPIO 17
 ALLOCATED_LED = 13  # GPIO 27
+
+
+# Classes
+
+class GracefulKiller:
+    kill_now = False
+
+    def __init__(self):
+        signal.signal(signal.SIGINT, self.exit_gracefully)
+        signal.signal(signal.SIGTERM, self.exit_gracefully)
+
+    def exit_gracefully(self, signum, frame):
+        self.kill_now = True
 
 
 # Functions
@@ -98,6 +112,8 @@ GPIO.output(ALLOCATED_LED, GPIO.HIGH)
 # Running server
 HEARTBEAT = False
 try:
+    killer = GracefulKiller()
+
     while True:
         # Toggle status led for heartbeat
         HEARTBEAT = not HEARTBEAT
@@ -130,6 +146,9 @@ try:
         sock = socket.socket(socket.AF_INET,  # Internet
                              socket.SOCK_DGRAM)  # UDP
         sock.sendto(MESSAGE_AS_BYTES, (UDP_IP, UDP_PORT))
+
+        if killer.kill_now:
+            break
 
         # wait for next update
         time.sleep(INTERVAL)
