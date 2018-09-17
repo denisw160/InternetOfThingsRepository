@@ -124,7 +124,6 @@ try:
             print("checksum:", CHECKSUM)
             print("checksum (hex):", hex(CHECKSUM))
 
-        # FixMe: perhaps a mistake in converting int to 2 bytes
         MESSAGE_AS_BYTES = MESSAGE_AS_BYTES + int2bytes(CHECKSUM)
 
         # Sending message
