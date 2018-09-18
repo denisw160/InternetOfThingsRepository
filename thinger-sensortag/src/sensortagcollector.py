@@ -24,9 +24,9 @@ BTNAME='Complete Local Name'
 MAXDEVICES=16
 
 # the interval in seconds for fast/medium/slow reading of sensors
-FAST = 0.2
-MEDIUM = 1.0
-SLOW = 5.0
+FAST = 2.0
+MEDIUM = 5.0
+SLOW = 10.0
 
 SENSORTYPES = [
     'accelerometer'
