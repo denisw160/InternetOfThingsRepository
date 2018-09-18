@@ -41,7 +41,7 @@ using namespace std;
 #define DEVICE_ID           "showcase"
 #define DEVICE_CREDENTIAL   "password"
 
-#define SENSORTAG_CMD       "python sensortagcollector.py -d "
+#define SENSORTAG_CMD       "python sensortagcollector.py"
 
 class Load {
 public:
@@ -135,29 +135,55 @@ Memory getMemory() {
     return memory;
 }
 
-void streamSensorTag(thinger_device thing) {
-//    FILE *fp;
-//    char json[1035];
-//
-//    /* Open the command for reading. */
-//    fp = popen(SENSORTAG_CMD, "r");
-//    if (fp == NULL) {
-//        printf("Failed to run command\n");
-//        exit(1);
-//    }
-//
-//    Json::Value root;
-//    Json::Reader reader;
-//
-//    /* Read the output a line at a time - output it. */
-//    while (fgets(json, sizeof(json) - 1, fp) != NULL) {
-//        //printf("%s", json);
-//
-//        bool parsingSuccessful = reader.parse(json, root); //parse process
+// TODO Restart on error
+void readSensorTagData(std::string parameter) {
+    FILE *fp;
+    char inputJson[1035];
+
+    /* Open the command for reading. */
+    std::string cmdString = SENSORTAG_CMD;
+    cmdString.append(parameter);
+    const char *cmd = cmdString.c_str();
+    // Only for debugging
+    printf("DEBUG: CMD %s\n", cmd);
+
+    // TODO try-finally
+    fp = popen(cmd, "r");
+    if (fp == NULL) {
+        printf("Failed to run command\n");
+        exit(1);
+    }
+
+    // JSON helper
+    Json::Value root;
+    Json::Reader reader;
+    Json::StreamWriterBuilder builder;
+    builder["indentation"] = ""; // whitespace-less output
+
+
+    /* Read the output a line at a time - output it. */
+    while (fgets(inputJson, sizeof(inputJson) - 1, fp) != NULL) {
+        // Only for debugging
+        printf("DEBUG: INPUT %s", inputJson);
+
+//        TODO Remove or skip input line
+//        bool parsingSuccessful = reader.parse(inputJson, root); //parse process
 //        if (!parsingSuccessful) {
 //            cout << "Failed to parse" << reader.getFormattedErrorMessages();
 //            exit(2);
 //        }
+
+        // Get name of the sensor
+        Json::Value sensorNameValue = root.get("devicename", "none"); // return none if no devicename
+        std::string sensorNameString = Json::writeString(builder, sensorNameValue);
+        const char *sensorName = sensorNameString.c_str();
+        // Only for debugging
+        printf("DEBUG: SENSOR %s\n", sensorName);
+
+        // TODO find sensor in map - skip if not a know sensor
+
+//      TODO copy value in senor data
+//      Types: accelerometer, lightmeter, humidity, barometer
 //
 //        if (root.get("devicename", "none") == "sensorRed" && root.isMember("accelerometer")) {
 //            Json::Value acc = root["accelerometer"];
@@ -170,13 +196,11 @@ void streamSensorTag(thinger_device thing) {
 //            sensorYellowAccelerometer.y = acc[1].asFloat();
 //            sensorYellowAccelerometer.z = acc[2].asFloat();
 //        }
-//
-//        // TODO Weitere Sensor-Daten (Licht, Temperatur)
-//    }
-//
-//    /* close */
-//    pclose(fp);
-//    printf("SensorTag terminated\n");
+    }
+
+    /* close */
+    pclose(fp);
+    printf("SensorTag terminated\n");
 }
 
 // Arguments are C4:BE:84:70:F6:8B=sensorRed A0:E6:F8:AE:37:80=sensorYellow
@@ -218,8 +242,11 @@ int main(int argc, char *argv[]) {
     };
 
     // Adding API for sensors from command line
+    std::string parameter = " -d";
     for (int i = 1; i < argc; ++i) {
         printf(" Adding sensor %i: %s\n", i, argv[i]);
+        parameter.append(" ");
+        parameter.append(argv[i]);
 
         static char *sensorName;
         strtok(argv[i], "=");
@@ -239,7 +266,7 @@ int main(int argc, char *argv[]) {
         };
     }
 
-    thread t(streamSensorTag, thing);
+    thread t(readSensorTagData, parameter);
     thing.start();
     return 0;
 }
