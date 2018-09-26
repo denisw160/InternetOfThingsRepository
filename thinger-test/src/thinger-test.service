@@ -1,6 +1,5 @@
-# Service to execute the Thinger-Test
 #
-# Change the local path to thinger if needed
+# Service to execute the Thinger-Test
 #
 
 [Unit]
