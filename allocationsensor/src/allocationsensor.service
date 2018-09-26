@@ -11,8 +11,8 @@ Wants=network-online.target
 [Service]
 Type=simple
 User=pi
-ExecStart=/home/pi/IoTRepository/allocationsensor/start.sh
-WorkingDirectory=/home/pi/IoTRepository/allocationsensor
+ExecStart=##APP_DIR##/start.sh
+WorkingDirectory=##APP_DIR##
 Restart=on-failure
 RestartSec=5
 
