@@ -2,6 +2,15 @@
 #
 # This scripts starts the sender i for testing the communication.
 #
+# For setup the TransportControl Server add the servername
+# transportcontrol.local in your DNS server or in /etc/hosts
+#
+# Setup for TransportControl in system environment, add these lines
+# in /etc/profile
+#
+# export TRANSPORTCONTROL_STATION=TCSAS001
+# export TRANSPORTCONTROL_PORT=1112
+#
 
 SERVER=transportcontrol.local
 PORT=1111
