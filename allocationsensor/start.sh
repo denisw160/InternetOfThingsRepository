@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# This scripts starts the sender i for testing the communication.
+# This scripts starts the sender for the communication.
 #
 # For setup the TransportControl Server add the servername
 # transportcontrol.local in your DNS server or in /etc/hosts
@@ -22,6 +22,11 @@
 SERVER=transportcontrol.local
 PORT=1111
 STATION=TCSAS001
+
+echo Starting AllocationSensor ...
+
+echo Using the following hosts:
+cat /etc/hosts
 
 if [ "$TRANSPORTCONTROL_PORT" != "" ]; then
     echo Setting port from environment
