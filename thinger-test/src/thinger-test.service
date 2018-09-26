@@ -11,8 +11,8 @@ Wants=network-online.target
 [Service]
 Type=simple
 User=pi
-ExecStart=/home/pi/IoTRepository/thinger-test/build/thinger
-WorkingDirectory=/home/pi/IoTRepository/thinger-test/build
+ExecStart=##APP_DIR##/build/thinger
+WorkingDirectory=##APP_DIR##/build
 Restart=on-failure
 RestartSec=5
 
