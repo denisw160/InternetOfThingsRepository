@@ -11,6 +11,13 @@
 # export TRANSPORTCONTROL_STATION=TCSAS001
 # export TRANSPORTCONTROL_PORT=1112
 #
+# For the system service add this to
+# sudo systemctl edit allocationsensor
+#
+# [Service]
+# Environment="TRANSPORTCONTROL_PORT=1112"
+# Environment="TRANSPORTCONTROL_STATION=TCSAS001"
+#
 
 SERVER=transportcontrol.local
 PORT=1111
