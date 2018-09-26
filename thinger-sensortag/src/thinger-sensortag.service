@@ -1,6 +1,5 @@
-# Service to execute the Thinger-Test
 #
-# Change the local path to thinger client if needed
+# Service to execute the Thinger-Test
 #
 
 [Unit]
@@ -11,8 +10,8 @@ Wants=network-online.target
 [Service]
 Type=simple
 User=pi
-ExecStart=/home/pi/IoTRepository/thinger-sensortag/start.sh
-WorkingDirectory=/home/pi/IoTRepository/thinger-sensortag
+ExecStart=##APP_DIR##/start.sh
+WorkingDirectory=##APP_DIR##
 Restart=on-failure
 RestartSec=5
 
