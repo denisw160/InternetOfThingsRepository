@@ -18,7 +18,7 @@ endif()
 OPTION(ENABLE_OPENSSL "Enable use of OpenSSL" ON)
 OPTION(DAEMON "Build thinger client as daemon" OFF)
 OPTION(EDISON "Enable build and install for Intel Edison" OFF)
-OPTION(RASPBERRY "Enable build and isntall for Raspberry Pi" OFF)
+OPTION(RASPBERRY "Enable build and install for Raspberry Pi" ON)
 
 # Find OpenSSL
 IF(ENABLE_OPENSSL)
