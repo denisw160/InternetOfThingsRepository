@@ -235,14 +235,14 @@ int main(int argc, char *argv[]) {
     thinger_device thing(userId, deviceId, deviceCredential);
 
     // Add API for system information
-    thing["load"] >> [](pson &out) {
+    thing["load"] >> [](pson &out, std::string resource) {
         Load l = getLoad();
         out["load1min"] = l.load1min;
         out["load3min"] = l.load3min;
         out["load5min"] = l.load5min;
     };
 
-    thing["memory"] >> [](pson &out) {
+    thing["memory"] >> [](pson &out, std::string resource) {
         Memory m = getMemory();
         out["total"] = m.total;
         out["used"] = m.total - m.free - m.cached;
@@ -268,20 +268,23 @@ int main(int argc, char *argv[]) {
         Sensor sensor{};
         sensors[sensorName] = sensor;
 
-        thing[sensorName] >> [](pson &out) {
-//            printf("Get Sensor Data for %s\n", sensorName);
-//            printf("Get Sensor Data for %s\n", getTest(sensorName));
-//
-//            out["accelerometerX"] = sensors[sensorName].accelerometerX;
-//            out["accelerometerY"] = sensors[sensorName].accelerometerY;
-//            out["accelerometerZ"] = sensors[sensorName].accelerometerZ;
-//            out["lightmeter"] = sensors[sensorName].lightmeter;
-//            out["temperature"] = sensors[sensorName].temperature;
-//            out["humidity"] = sensors[sensorName].humidity;
-//            out["barometer"] = sensors[sensorName].barometer;
-//
-//
-//            printf("Get Sensor Data %s\n", sensors[sensorName].accelerometerX);
+        thing[sensorName] >> [](pson &out, std::string resource) mutable {
+            printf("Get Sensor Data for %s\n", resource.c_str());
+
+            // Find sensor and return data
+            bool containsSensor = sensors.find(resource) != sensors.end();
+            if (containsSensor) {
+                Sensor s = sensors[resource];
+                out["accelerometerX"] = s.accelerometerX;
+                out["accelerometerY"] = s.accelerometerY;
+                out["accelerometerZ"] = s.accelerometerZ;
+                out["lightmeter"] = s.lightmeter;
+                out["temperature"] = s.temperature;
+                out["humidity"] = s.humidity;
+                out["barometer"] = s.barometer;
+            } else {
+                printf("Sensor not found for %s\n", resource.c_str());
+            }
         };
     }
 
