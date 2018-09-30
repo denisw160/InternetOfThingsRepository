@@ -140,6 +140,7 @@ void readSensorTagData(std::string parameter) {
     std::string cmdString = SENSORTAG_CMD;
     cmdString.append(parameter);
     const char *cmd = cmdString.c_str();
+
     // Only for debugging
     printf("DEBUG: CMD %s\n", cmd);
 
@@ -162,12 +163,13 @@ void readSensorTagData(std::string parameter) {
         // Only for debugging
         printf("DEBUG: INPUT %s", inputJson);
 
-//        TODO Remove or skip input line
-//        bool parsingSuccessful = reader.parse(inputJson, root); //parse process
-//        if (!parsingSuccessful) {
-//            cout << "Failed to parse" << reader.getFormattedErrorMessages();
-//            exit(2);
-//        }
+        // Skip line if not parse is unsuccessfully
+        bool parsingSuccessful = reader.parse(inputJson, root); //parse process
+        if (!parsingSuccessful) {
+            printf("ERROR: LINE %s", inputJson);
+            cout << "Failed to parse" << reader.getFormattedErrorMessages();
+            continue;
+        }
 
         // Get name of the sensor
         Json::Value sensorNameValue = root.get("devicename", "none"); // return none if no devicename
@@ -176,22 +178,30 @@ void readSensorTagData(std::string parameter) {
         // Only for debugging
         printf("DEBUG: SENSOR %s\n", sensorName);
 
-        // TODO find sensor in map - skip if not a know sensor
+        bool containsSensor = sensors.count(sensorName) == 1;
+        if (containsSensor) {
+            Sensor sensor = sensors[sensorName];
+            if (root.isMember("accelerometer")) {
+                Json::Value acc = root["accelerometer"];
+                sensor.accelerometerX = acc[0].asFloat();
+                sensor.accelerometerY = acc[1].asFloat();
+                sensor.accelerometerZ = acc[2].asFloat();
+            } else if (root.isMember("humidity")) {
+                Json::Value acc = root["humidity"];
+                sensor.temperature = acc[0].asFloat();
+                sensor.humidity = acc[1].asFloat();
+            } else if (root.isMember("barometer")) {
+                Json::Value acc = root["barometer"];
+                sensor.temperature = acc[0].asFloat();
+                sensor.barometer = acc[1].asFloat();
+            } else if (root.isMember("lightmeter")) {
+                Json::Value acc = root["lightmeter"];
+                sensor.lightmeter = acc.asFloat();
+            } else {
+                printf("WARN: Unknown value %s", inputJson);
+            }
 
-//      TODO copy value in senor data
-//      Types: accelerometer, lightmeter, humidity, barometer
-//
-//        if (root.get("devicename", "none") == "sensorRed" && root.isMember("accelerometer")) {
-//            Json::Value acc = root["accelerometer"];
-//            sensorRedAccelerometer.x = acc[0].asFloat();
-//            sensorRedAccelerometer.y = acc[1].asFloat();
-//            sensorRedAccelerometer.z = acc[2].asFloat();
-//        } else if (root.get("devicename", "none") == "sensorYellow" && root.isMember("accelerometer")) {
-//            Json::Value acc = root["accelerometer"];
-//            sensorYellowAccelerometer.x = acc[0].asFloat();
-//            sensorYellowAccelerometer.y = acc[1].asFloat();
-//            sensorYellowAccelerometer.z = acc[2].asFloat();
-//        }
+        }
     }
 
     /* close */
