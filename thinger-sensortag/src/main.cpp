@@ -174,11 +174,11 @@ void readSensorTagData(std::string parameter) {
         // Get name of the sensor
         Json::Value sensorNameValue = root.get("devicename", "none"); // return none if no devicename
         std::string sensorNameString = Json::writeString(builder, sensorNameValue);
-        const char *sensorName = sensorNameString.c_str();
+        std::string sensorName = sensorNameString.substr(1, sensorNameString.length() - 2);
         // Only for debugging
-        printf("DEBUG: SENSOR %s\n", sensorName);
+        printf("DEBUG: RECEIVING DATA FOR %s\n", sensorName.c_str());
 
-        bool containsSensor = sensors.count(sensorName) == 1;
+        bool containsSensor = sensors.find(sensorName) != sensors.end();
         if (containsSensor) {
             Sensor sensor = sensors[sensorName];
             if (root.isMember("accelerometer")) {
@@ -198,9 +198,12 @@ void readSensorTagData(std::string parameter) {
                 Json::Value acc = root["lightmeter"];
                 sensor.lightmeter = acc.asFloat();
             } else {
-                printf("WARN: Unknown value %s", inputJson);
+                printf("WARN: UNKNOWN VALUE %s", inputJson);
             }
 
+            printf("DEBUG: DATA UPDATED FOR %s\n", sensorName.c_str());
+        } else {
+            printf("ERROR: NO SENSOR FOUND FOR %s\n", sensorName.c_str());
         }
     }
 
@@ -258,7 +261,7 @@ int main(int argc, char *argv[]) {
         parameter.append(" ");
         parameter.append(argv[i]);
 
-        static char *sensorName;
+        char *sensorName;
         strtok(argv[i], "=");
         sensorName = strtok(nullptr, "=");
 
@@ -266,13 +269,19 @@ int main(int argc, char *argv[]) {
         sensors[sensorName] = sensor;
 
         thing[sensorName] >> [](pson &out) {
-            out["accelerometerX"] = sensors[sensorName].accelerometerX;
-            out["accelerometerY"] = sensors[sensorName].accelerometerY;
-            out["accelerometerZ"] = sensors[sensorName].accelerometerZ;
-            out["lightmeter"] = sensors[sensorName].lightmeter;
-            out["temperature"] = sensors[sensorName].temperature;
-            out["humidity"] = sensors[sensorName].humidity;
-            out["barometer"] = sensors[sensorName].barometer;
+//            printf("Get Sensor Data for %s\n", sensorName);
+//            printf("Get Sensor Data for %s\n", getTest(sensorName));
+//
+//            out["accelerometerX"] = sensors[sensorName].accelerometerX;
+//            out["accelerometerY"] = sensors[sensorName].accelerometerY;
+//            out["accelerometerZ"] = sensors[sensorName].accelerometerZ;
+//            out["lightmeter"] = sensors[sensorName].lightmeter;
+//            out["temperature"] = sensors[sensorName].temperature;
+//            out["humidity"] = sensors[sensorName].humidity;
+//            out["barometer"] = sensors[sensorName].barometer;
+//
+//
+//            printf("Get Sensor Data %s\n", sensors[sensorName].accelerometerX);
         };
     }
 
