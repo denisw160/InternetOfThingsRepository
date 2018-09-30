@@ -131,8 +131,8 @@ Memory getMemory() {
     return memory;
 }
 
-// TODO Restart on error
-void readSensorTagData(std::string parameter) {
+
+void readSensorTagDataExecution(std::string parameter) {
     FILE *fp;
     char inputJson[1035];
 
@@ -144,7 +144,6 @@ void readSensorTagData(std::string parameter) {
     // Only for debugging
     //printf("DEBUG: CMD %s\n", cmd);
 
-    // TODO try-finally
     fp = popen(cmd, "r");
     if (fp == NULL) {
         printf("Failed to run command\n");
@@ -212,6 +211,13 @@ void readSensorTagData(std::string parameter) {
     /* close */
     pclose(fp);
     printf("SensorTag terminated\n");
+}
+
+void readSensorTagData(std::string parameter) {
+    // Running in loop, if pipe is broken
+    while (true) {
+        readSensorTagDataExecution(parameter);
+    }
 }
 
 // Arguments are UserId, DeviceId, DeviceCredential, C4:BE:84:70:F6:8B=sensorRed A0:E6:F8:AE:37:80=sensorYellow
