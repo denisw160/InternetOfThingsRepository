@@ -8,8 +8,8 @@
 
 # Parameter for connection
 USERID=denisw
-DEVICEID=TEST
-DEVICECREDENTIAL=pasW0rdZ
+DEVICEID=$HOSTNAME
+DEVICECREDENTIAL=password
 
 # Building the release
 ./build.sh
