@@ -40,7 +40,7 @@ public:
 public:
 
     struct entry {
-        entry(const char* key) : key_(key), next_(NULL){
+        entry(const char* key) : key_(key), next_(NULL), value_(key){
 
         }
 

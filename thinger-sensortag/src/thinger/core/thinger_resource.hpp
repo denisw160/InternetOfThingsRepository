@@ -28,6 +28,8 @@
 #include "pson.h"
 #include "thinger_message.hpp"
 
+#include <string>
+
 namespace thinger{
 
 
@@ -53,13 +55,15 @@ public:
         return streaming_count_;
     }
 
+    std::string name;
+
 private:
 
     // calback for function, input, output, or input/output
     union callback{
         void (*run)();
         void (*pson_in)(protoson::pson& in);
-        void (*pson_out)(protoson::pson& out);
+        void (*pson_out)(protoson::pson& out, std::string resourceName);
         void (*pson_in_pson_out)(protoson::pson& in, protoson::pson& out);
     };
 
@@ -93,8 +97,9 @@ private:
     }
 
 public:
-    thinger_resource() : io_type_(none), access_type_(PRIVATE), stream_id_(0), streaming_freq_(0), last_streaming_(0)
-    {}
+    thinger_resource(std::string resourceName) : io_type_(none), access_type_(PRIVATE), stream_id_(0), streaming_freq_(0), last_streaming_(0) {
+        this->name = resourceName;
+    }
 
     void disable_streaming(){
         stream_id_ = 0;
@@ -164,7 +169,7 @@ public:
         if(io_type_ == pson_in){
             callback_.pson_in(content["in"]);
         }else if(io_type_ == pson_out){
-            callback_.pson_out(content["out"]);
+            callback_.pson_out(content["out"], this->name);
         }else if(io_type_ == pson_in_pson_out){
             callback_.pson_in_pson_out(content["in"], content["out"]);
         }
@@ -172,7 +177,7 @@ public:
 
     void fill_output(protoson::pson& content){
         if(io_type_ == pson_out){
-            callback_.pson_out(content);
+            callback_.pson_out(content, this->name);
         }
     }
 
@@ -213,7 +218,7 @@ public:
     /**
      * Establish a function that only generates an output
      */
-    void operator>>(void (*out_function)(protoson::pson& out)){
+    void operator>>(void (*out_function)(protoson::pson& out, std::string resourceName)){
         io_type_ = pson_out;
         callback_.pson_out = out_function;
     }
@@ -221,7 +226,7 @@ public:
     /**
      * Establish a function that only generates an output
      */
-    void set_output(void (*out_function)(protoson::pson& out)){
+    void set_output(void (*out_function)(protoson::pson& out, std::string resourceName)){
         io_type_ = pson_out;
         callback_.pson_out = out_function;
     }
@@ -257,7 +262,7 @@ public:
                         callback_.pson_in(request);
                         break;
                     case pson_out:
-                        callback_.pson_out(response);
+                        callback_.pson_out(response, this->name);
                         break;
                     case pson_in_pson_out:
                         callback_.pson_in_pson_out(request, response);

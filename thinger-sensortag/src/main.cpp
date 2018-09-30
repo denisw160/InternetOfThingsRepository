@@ -237,14 +237,14 @@ int main(int argc, char *argv[]) {
     thinger_device thing(userId, deviceId, deviceCredential);
 
     // Add API for system information
-    thing["load"] >> [](pson &out, std::string resource) {
+    thing["load"] >> [](pson &out, std::string resourceName) {
         Load l = getLoad();
         out["load1min"] = l.load1min;
         out["load3min"] = l.load3min;
         out["load5min"] = l.load5min;
     };
 
-    thing["memory"] >> [](pson &out, std::string resource) {
+    thing["memory"] >> [](pson &out, std::string resourceName) {
         Memory m = getMemory();
         out["total"] = m.total;
         out["used"] = m.total - m.free - m.cached;
@@ -270,14 +270,14 @@ int main(int argc, char *argv[]) {
         Sensor sensor{};
         sensors[sensorName] = sensor;
 
-        thing[sensorName] >> [](pson &out, std::string resource) mutable {
+        thing[sensorName] >> [](pson &out, std::string resourceName) mutable {
             // Only for debugging
-            //printf("DEBUG: GET SENSOR DATA FOR %s\n", resource.c_str());
+            //printf("DEBUG: GET SENSOR DATA FOR %s\n", resourceName.c_str());
 
             // Find sensor and return data
-            bool containsSensor = sensors.find(resource) != sensors.end();
+            bool containsSensor = sensors.find(resourceName) != sensors.end();
             if (containsSensor) {
-                Sensor s = sensors[resource];
+                Sensor s = sensors[resourceName];
                 out["accelerometerX"] = s.accelerometerX;
                 out["accelerometerY"] = s.accelerometerY;
                 out["accelerometerZ"] = s.accelerometerZ;
@@ -286,7 +286,7 @@ int main(int argc, char *argv[]) {
                 out["humidity"] = s.humidity;
                 out["barometer"] = s.barometer;
             } else {
-                printf("ERROR: GET DATA FOR SENSOR NOT FOUND - %s\n", resource.c_str());
+                printf("ERROR: GET DATA FOR SENSOR NOT FOUND - %s\n", resourceName.c_str());
             }
         };
     }
