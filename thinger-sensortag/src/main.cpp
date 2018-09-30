@@ -286,7 +286,7 @@ int main(int argc, char *argv[]) {
                 out["humidity"] = s.humidity;
                 out["barometer"] = s.barometer;
             } else {
-                printf("ERROR: SENSOR NOT FOUND FOR %s\n", resource.c_str());
+                printf("ERROR: GET DATA FOR SENSOR NOT FOUND - %s\n", resource.c_str());
             }
         };
     }
