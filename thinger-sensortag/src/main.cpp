@@ -73,7 +73,7 @@ public:
     float barometer;
 };
 
-map<string, Sensor> sensors;
+static map<string, Sensor> sensors;
 
 Load getLoad() {
     Load load{};
@@ -142,7 +142,7 @@ void readSensorTagData(std::string parameter) {
     const char *cmd = cmdString.c_str();
 
     // Only for debugging
-    printf("DEBUG: CMD %s\n", cmd);
+    //printf("DEBUG: CMD %s\n", cmd);
 
     // TODO try-finally
     fp = popen(cmd, "r");
@@ -176,7 +176,7 @@ void readSensorTagData(std::string parameter) {
         std::string sensorNameString = Json::writeString(builder, sensorNameValue);
         std::string sensorName = sensorNameString.substr(1, sensorNameString.length() - 2);
         // Only for debugging
-        printf("DEBUG: RECEIVING DATA FOR %s\n", sensorName.c_str());
+        //printf("DEBUG: RECEIVING DATA FOR %s\n", sensorName.c_str());
 
         bool containsSensor = sensors.find(sensorName) != sensors.end();
         if (containsSensor) {
@@ -201,7 +201,9 @@ void readSensorTagData(std::string parameter) {
                 printf("WARN: UNKNOWN VALUE %s", inputJson);
             }
 
-            printf("DEBUG: DATA UPDATED FOR %s\n", sensorName.c_str());
+            sensors[sensorName] = sensor;
+            // Only for debugging
+            //printf("DEBUG: DATA UPDATED FOR %s\n", sensorName.c_str());
         } else {
             printf("ERROR: NO SENSOR FOUND FOR %s\n", sensorName.c_str());
         }
@@ -219,11 +221,11 @@ int main(int argc, char *argv[]) {
 
     // only for debugging
     for (int i = 0; i < argc; ++i) {
-        printf("argv %i: %s\n", i, argv[i]);
+        printf(" argv %i: %s\n", i, argv[i]);
     }
 
     if (argc < 5) {
-        printf("Necessary arguments not found, please use [USER_ID] [DEVICE_ID] [DEVICE_CREDENTIAL] C4:BE:84:70:F6:8B=sensorRed A0:E6:F8:AE:37:80=sensorYellow or something like that\n");
+        printf(" Necessary arguments not found, please use [USER_ID] [DEVICE_ID] [DEVICE_CREDENTIAL] C4:BE:84:70:F6:8B=sensorRed A0:E6:F8:AE:37:80=sensorYellow or something like that\n");
         exit(-1);
     }
 
@@ -269,7 +271,8 @@ int main(int argc, char *argv[]) {
         sensors[sensorName] = sensor;
 
         thing[sensorName] >> [](pson &out, std::string resource) mutable {
-            printf("Get Sensor Data for %s\n", resource.c_str());
+            // Only for debugging
+            //printf("DEBUG: GET SENSOR DATA FOR %s\n", resource.c_str());
 
             // Find sensor and return data
             bool containsSensor = sensors.find(resource) != sensors.end();
@@ -283,7 +286,7 @@ int main(int argc, char *argv[]) {
                 out["humidity"] = s.humidity;
                 out["barometer"] = s.barometer;
             } else {
-                printf("Sensor not found for %s\n", resource.c_str());
+                printf("ERROR: SENSOR NOT FOUND FOR %s\n", resource.c_str());
             }
         };
     }
