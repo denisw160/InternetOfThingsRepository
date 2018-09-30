@@ -37,10 +37,6 @@
 
 using namespace std;
 
-#define USER_ID             "izb"
-#define DEVICE_ID           "showcase"
-#define DEVICE_CREDENTIAL   "password"
-
 #define SENSORTAG_CMD       "python sensortagcollector.py"
 
 class Load {
@@ -203,23 +199,27 @@ void readSensorTagData(std::string parameter) {
     printf("SensorTag terminated\n");
 }
 
-// Arguments are C4:BE:84:70:F6:8B=sensorRed A0:E6:F8:AE:37:80=sensorYellow
+// Arguments are UserId, DeviceId, DeviceCredential, C4:BE:84:70:F6:8B=sensorRed A0:E6:F8:AE:37:80=sensorYellow
 int main(int argc, char *argv[]) {
     printf("Starting Gateway for SensorTags\n");
-    printf(" Reading from %i sensors\n", argc - 1);
+    printf(" Reading from %i sensors\n", argc - 4);
 
-//    // only for debugging
-//    for (int i = 0; i < argc; ++i) {
-//        printf("argv %i: %s\n", i, argv[i]);
-//    }
+    // only for debugging
+    for (int i = 0; i < argc; ++i) {
+        printf("argv %i: %s\n", i, argv[i]);
+    }
 
-    if (argc < 2) {
-        printf("No arguments found, please use C4:BE:84:70:F6:8B=sensorRed A0:E6:F8:AE:37:80=sensorYellow or something like that\n");
+    if (argc < 5) {
+        printf("Necessary arguments not found, please use [USER_ID] [DEVICE_ID] [DEVICE_CREDENTIAL] C4:BE:84:70:F6:8B=sensorRed A0:E6:F8:AE:37:80=sensorYellow or something like that\n");
         exit(-1);
     }
 
+    char *userId = argv[1];
+    char *deviceId = argv[2];
+    char *deviceCredential = argv[3];
+
     // Register on Thinger.io server (iot.thinger.io)
-    thinger_device thing(USER_ID, DEVICE_ID, DEVICE_CREDENTIAL);
+    thinger_device thing(userId, deviceId, deviceCredential);
 
     // Add API for system information
     thing["load"] >> [](pson &out) {
@@ -243,7 +243,7 @@ int main(int argc, char *argv[]) {
 
     // Adding API for sensors from command line
     std::string parameter = " -d";
-    for (int i = 1; i < argc; ++i) {
+    for (int i = 4; i < argc; ++i) {
         printf(" Adding sensor %i: %s\n", i, argv[i]);
         parameter.append(" ");
         parameter.append(argv[i]);
