@@ -2,9 +2,14 @@
 #
 # This scripts starts the Thinger.io client.
 #
-# For setup the server for Thinger.io add the servername
+# For setup a local server for Thinger.io add the servername
 # iot.thinger.io in your DNS server or in /etc/hosts
 #
+
+# Parameter for connection
+USERID=denisw
+DEVICEID=$HOSTNAME
+DEVICECREDENTIAL=password
 
 # Building the release
 ./build.sh
@@ -16,4 +21,4 @@ echo Using the following hosts:
 cat /etc/hosts
 
 # Starting the client
-./thinger
+./thinger ${USERID} ${DEVICEID} ${DEVICECREDENTIAL}

@@ -23,16 +23,10 @@
 
 #include "thinger/thinger.h"
 
-#define USER_ID             "izb"
-#define DEVICE_ID           "demo"
-#define DEVICE_CREDENTIAL   "password"
-
-int random_number(int min_num, int max_num)
-{
+int random_number(int min_num, int max_num) {
     int result = 0, low_num = 0, hi_num = 0;
 
-    if (min_num < max_num)
-    {
+    if (min_num < max_num) {
         low_num = min_num;
         hi_num = max_num + 1; // include max_num in output
     } else {
@@ -45,11 +39,27 @@ int random_number(int min_num, int max_num)
     return result;
 }
 
-int main(int argc, char *argv[])
-{
-    thinger_device thing(USER_ID, DEVICE_ID, DEVICE_CREDENTIAL);
+int main(int argc, char *argv[]) {
+    printf("Starting Thinger-Test\n");
 
-    thing["random"] >> [](pson& out){
+    // only for debugging
+    for (int i = 0; i < argc; ++i) {
+        printf("argv %i: %s\n", i, argv[i]);
+    }
+
+    if (argc < 4) {
+        printf("Necessary arguments not found, please use [USER_ID] [DEVICE_ID] [DEVICE_CREDENTIAL]\n");
+        exit(-1);
+    }
+
+    char *userId = argv[1];
+    char *deviceId = argv[2];
+    char *deviceCredential = argv[3];
+
+    // Register on Thinger.io server (iot.thinger.io)
+    thinger_device thing(userId, deviceId, deviceCredential);
+
+    thing["random"] >> [](pson &out) {
         out["result"] = (int) random_number(1, 100);
     };
 
