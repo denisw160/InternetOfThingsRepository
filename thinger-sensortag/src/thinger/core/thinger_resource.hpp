@@ -28,8 +28,6 @@
 #include "pson.h"
 #include "thinger_message.hpp"
 
-#include <string>
-
 namespace thinger{
 
 
@@ -61,7 +59,7 @@ private:
     union callback{
         void (*run)();
         void (*pson_in)(protoson::pson& in);
-        void (*pson_out)(protoson::pson& out, std::string resource);
+        void (*pson_out)(protoson::pson& out);
         void (*pson_in_pson_out)(protoson::pson& in, protoson::pson& out);
     };
 
@@ -162,19 +160,19 @@ public:
         }
     }
 
-    void fill_api_io(protoson::pson_object& content, std::string resource){
+    void fill_api_io(protoson::pson_object& content){
         if(io_type_ == pson_in){
             callback_.pson_in(content["in"]);
         }else if(io_type_ == pson_out){
-            callback_.pson_out(content["out"], resource);
+            callback_.pson_out(content["out"]);
         }else if(io_type_ == pson_in_pson_out){
             callback_.pson_in_pson_out(content["in"], content["out"]);
         }
     }
 
-    void fill_output(protoson::pson& content, std::string resource){
+    void fill_output(protoson::pson& content){
         if(io_type_ == pson_out){
-            callback_.pson_out(content, resource);
+            callback_.pson_out(content);
         }
     }
 
@@ -215,7 +213,7 @@ public:
     /**
      * Establish a function that only generates an output
      */
-    void operator>>(void (*out_function)(protoson::pson& out, std::string resource)){
+    void operator>>(void (*out_function)(protoson::pson& out)){
         io_type_ = pson_out;
         callback_.pson_out = out_function;
     }
@@ -223,7 +221,7 @@ public:
     /**
      * Establish a function that only generates an output
      */
-    void set_output(void (*out_function)(protoson::pson& out, std::string resource)){
+    void set_output(void (*out_function)(protoson::pson& out)){
         io_type_ = pson_out;
         callback_.pson_out = out_function;
     }
@@ -247,7 +245,7 @@ public:
     /**
      * Handle a request and fill a possible response
      */
-    void handle_request(thinger_message& request, thinger_message& response, std::string resource){
+    void handle_request(thinger_message& request, thinger_message& response){
         switch(request.get_signal_flag()){
             // default action over the stream (run the resource)
             case thinger_message::NONE:
@@ -259,7 +257,7 @@ public:
                         callback_.pson_in(request);
                         break;
                     case pson_out:
-                        callback_.pson_out(response, resource);
+                        callback_.pson_out(response);
                         break;
                     case pson_in_pson_out:
                         callback_.pson_in_pson_out(request, response);

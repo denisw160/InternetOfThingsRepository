@@ -33,9 +33,6 @@
 #include "thinger_message.hpp"
 #include "thinger_io.hpp"
 
-#include <iostream>
-#include <string>
-
 #define KEEP_ALIVE_MILLIS 60000
 
 namespace thinger{
@@ -84,8 +81,7 @@ namespace thinger{
             thinger_message message;
             message.set_stream_id(resource.get_stream_id());
             message.set_signal_flag(type);
-            std::string resourceString = "Unknown";
-            resource.fill_api_io(message.get_data(), resourceString);
+            resource.fill_api_io(message.get_data());
             send_message(message);
         }
 
@@ -131,7 +127,7 @@ namespace thinger{
             message.set_signal_flag(thinger_message::CALL_DEVICE);
             message.set_identifier(device_name);
             message.resources().add(resource_name);
-            resource.fill_output(message.get_data(), resource_name);
+            resource.fill_output(message.get_data());
             return send_message(message);
         }
 
@@ -154,7 +150,7 @@ namespace thinger{
             thinger_message message;
             message.set_signal_flag(thinger_message::CALL_ENDPOINT);
             message.set_identifier(endpoint_name);
-            resource.fill_output(message.get_data(), endpoint_name);
+            resource.fill_output(message.get_data());
             return send_message(message);
         }
 
@@ -278,30 +274,14 @@ namespace thinger{
                                     current = current->next_;
                                 }
                             }else{
-                                std::string resourceString = "Unknown1";
-                                if(request.has_resource()){
-                                    if(request.resources().size() > 1){
-                                        auto item = request.resources()[0]->get_value();
-                                        resourceString = (char*)item;
-                                    }
-                                }
-
-                                thing_resource->fill_api_io(response.get_data(), resourceString);
+                                thing_resource->fill_api_io(response.get_data());
                             }
                         }else{
                             thing_resource = thing_resource == NULL ? resources_.find(resource) : thing_resource->find(resource);
                             if(thing_resource==NULL){
                                 response.set_signal_flag(thinger_message::REQUEST_ERROR);
                             }else{
-                                std::string resourceString = "Unknown2";
-                                if(request.has_resource()){
-                                    if(request.resources().size() > 1){
-                                        auto item = request.resources()[0]->get_value();
-                                        resourceString = (char*)item;
-                                    }
-                                }
-
-                                thing_resource->handle_request(request, response, resource);
+                                thing_resource->handle_request(request, response);
                                 // stream enabled over a resource input -> notify the current state
                                 if(thing_resource->stream_enabled() && thing_resource->get_io_type()==thinger_resource::pson_in){
                                     // send normal response
