@@ -5,7 +5,7 @@
 # For setup a local server for Thinger.io add the servername
 # iot.thinger.io in your DNS server or in /etc/hosts
 #
-# For setup the parameter in system environment, please use command #
+# For setup the parameter in system environment, please use command
 # sudo systemctl edit thinger-monitor
 #
 # and add following lines
