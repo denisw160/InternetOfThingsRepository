@@ -44,17 +44,22 @@ For setup the Server add the servername server.local in your DNS server or in /e
 
 Setup in global system environment, add these lines in /etc/profile (or similar)
 
-	export SERVER_STATION=TCSAS001
-	export SERVER_PORT=1112
+```
+export SERVER_STATION=TCSAS001
+export SERVER_PORT=1112
+```
 
 For the system service add this to
 
-	sudo systemctl edit allocationsensor
+```
+sudo systemctl edit allocationsensor
+```
 
-
-	[Service]
-	Environment="SERVER_PORT=1112"
-	Environment="SERVER_STATION=TCSAS001"
+```
+[Service]
+Environment="SERVER_PORT=1112"
+Environment="SERVER_STATION=TCSAS001"
+```
 
 [image-1]:	doc/Design_P1KH001_v2_Plug-in_board.png "Plug-in Board"
 [image-2]:	doc/Realisation_example.jpg "Example image of the connection"
