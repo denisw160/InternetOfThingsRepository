@@ -49,11 +49,7 @@ export SERVER_STATION=TCSAS001
 export SERVER_PORT=1112
 ```
 
-For the system service add this to
-
-```
-sudo systemctl edit allocationsensor
-```
+For the systemd service you open the service configuration with `sudo systemctl edit allocationsensor` and add this lines
 
 ```
 [Service]
