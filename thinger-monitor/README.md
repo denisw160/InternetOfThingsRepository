@@ -18,7 +18,7 @@ Use can you the `setup.sh` to install the compile dependencies.
 
 ## Run as systemd service
 
-The client can also be operated as a system service. Just use the scripts install.sh or uninstall.sh.
+The client can also be operated as a system service. Just use the scripts `install.sh` or `uninstall.sh`.
 
 For setup a local server for Thinger.io add the servername iot.thinger.io in your DNS server or in `/etc/hosts`.
 
