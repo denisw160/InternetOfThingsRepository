@@ -43,11 +43,14 @@ In order for the service to use the parameters of the corresponding environment,
 For setup the Server add the servername server.local in your DNS server or in /etc/hosts
 
 Setup in global system environment, add these lines in /etc/profile (or similar)
+
 	export SERVER_STATION=TCSAS001
 	export SERVER_PORT=1112
 
 For the system service add this to
-sudo systemctl edit allocationsensor
+
+	sudo systemctl edit allocationsensor
+
 
 	[Service]
 	Environment="SERVER_PORT=1112"
