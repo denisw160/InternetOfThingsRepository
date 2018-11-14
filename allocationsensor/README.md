@@ -10,7 +10,7 @@ The electrical wiring diagram can be found in the doc folder.
 
 ![Schematic structure][image-1]
 
-** Example of realization**
+**Example of realization**
 
 ![Example of realization][image-2]
 
