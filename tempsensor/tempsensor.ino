@@ -23,6 +23,10 @@ DallasTemperature sensors(&oneWire);
 // Heartbeat status
 boolean led = false;
 
+// Temperature offset - to fix temperature
+float offset = 0.25;
+
+
 void setup(void)
 {
   // Initialize Debug-Console
@@ -55,6 +59,12 @@ void setup(void)
 
   // Initialize Sensors
   sensors.begin();
+
+  // Set the resolution to 10 bit - Valid values are 9, 10, or 11 bit.
+  sensors.setResolution(10);
+  // Confirm that we set that resolution by asking the DS18B20 to repeat it back
+  Serial.print("Sensor Resolution: ");
+  Serial.println(sensors.getResolution(), DEC);
 
   // Associate the handler function to the path
   server.on("/", handleRequest);
@@ -92,7 +102,7 @@ void handleRequest() {
 
 float getTemperature() {
   sensors.requestTemperatures();
-  return sensors.getTempCByIndex(0);
+  return sensors.getTempCByIndex(0) + offset;
 }
 
 void heartbeat() {
