@@ -20,11 +20,18 @@ ESP8266WebServer server(80);
 OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
 
+// Temperature offset - to fix temperature
+const float offset = 0.25;
+
 // Heartbeat status
 boolean led = false;
 
-// Temperature offset - to fix temperature
-float offset = 0.25;
+// Generally, you should use "unsigned long" for variables that hold time
+// The value will quickly become too large for an int to store
+unsigned long previousMillis = 0;        // will store last time LED was updated
+
+// constants won't change:
+const long interval = 30000;           // interval at which to blink (milliseconds)
 
 
 void setup(void)
@@ -106,15 +113,20 @@ float getTemperature() {
 }
 
 void heartbeat() {
-  if (led) {
-    digitalWrite(LED_BUILTIN, LOW);
-    Serial.print("*");
-    delay(1000);
-    led = false;
-  } else {
-    digitalWrite(LED_BUILTIN, HIGH);
-    delay(2000);
-    Serial.print("-");
-    led = true;
+  unsigned long currentMillis = millis();
+
+  if (currentMillis - previousMillis >= interval) {
+    // Save the last time changed the LED
+    previousMillis = currentMillis;
+
+    if (led) {
+      digitalWrite(LED_BUILTIN, LOW);
+      Serial.print("*");
+      led = false;
+    } else {
+      digitalWrite(LED_BUILTIN, HIGH);
+      Serial.print("-");
+      led = true;
+    }
   }
 }
