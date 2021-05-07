@@ -38,7 +38,7 @@ The construction can be found in the [fritzing file][6].
 [2]:	https://github.com/tzapu/WiFiManager
 [3]:	https://github.com/tzapu/WiFiManager/blob/master/examples/AutoConnect/AutoConnect.ino
 [4]:	https://github.com/markruys/arduino-Max72xxPanel 
-[5]:	TempsensorRest_v2.ino
+[5]:	led-matrix.ino
 [6]:	doc/led-matrix.fzz "Fritzing file for the LED-Matrix"
 
 [image-1]:	doc/led-matrix.jpg "LED matrix"
