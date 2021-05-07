@@ -1,0 +1,5 @@
+/************************( HTML page for configuration )***********************************/
+#ifndef header_h
+#define header_h
+String htmlPage = "@@html@@";
+#endif
