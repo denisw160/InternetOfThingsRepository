@@ -37,6 +37,8 @@
 #include <Adafruit_GFX.h>          // Character fonts
 #include <Max72xxPanel.h>          // Control of the MAX7219 driver
 
+#include <EasyButton.h>            // Include button handling
+
 #include "HtmlPage.h"              // H-File with HTML page as string (var htmlPage)
 
 /************************( Global constants )*********************************************/
@@ -48,6 +50,7 @@
 // CS                D8 (GPIO15)
 // CLK               D5 (GPIO14)
 
+const int pinFlashButton             = 0;     // Flash-Button-PIN (NodeMCU v3 Lolin)
 const int pinLED                     = 2;     // LED-PIN (NodeMCU v3 Lolin)
 const int pinCS                      = 15;    // CS-PIN / D8 / GPIO15
 const int numberOfHorizontalDisplays = 4;     // Number of horizontal modules
@@ -58,6 +61,12 @@ const int spacer                     = 1;     // Space length
 /************************( Initialize libraries )*****************************************/
 // Start web server with the HTML page fron "HtmlPage.h".
 ESP8266WebServer server(httpPort);
+
+// Set WiFi with WiFiManager
+WiFiManager wm;
+
+// Handling flash button
+EasyButton resetButton(pinFlashButton);
 
 // Setup dot matrix
 Max72xxPanel matrix = Max72xxPanel(pinCS, numberOfHorizontalDisplays, numberOfVerticalDisplays);
@@ -73,6 +82,8 @@ int brightness      = 0;                        // Default brightness (0 to 15)
 /************************( Setup )*********************************************************/
 void setup() {
   // Initialize the LED_BUILTIN pin as an output
+  // (Note that LOW is the voltage level but actually the LED is on; 
+  // this is because it is active low on the ESP-01)
   pinMode(pinLED, OUTPUT);
   digitalWrite(pinLED, HIGH);
 
@@ -87,14 +98,10 @@ void setup() {
   // Initialize WiFi with WiFiManager
   // explicitly set mode, esp defaults to STA+AP
   WiFi.mode(WIFI_STA);
-  WiFiManager wm;
-
-  // Reset settings - wipe credentials for testing
-  //wm.resetSettings();
 
   // Automatically connect using saved credentials,
   // if connection fails, it starts an access point
-  if (! wm.autoConnect()) {
+  if (!wm.autoConnect()) {
     Serial.println("Error setting up WiFiManager!");
     haltOnError();
   }
@@ -106,16 +113,16 @@ void setup() {
     delay(500);
     Serial.print(".");
   }
-  Serial.println();
-  Serial.print("Connected, IP address: ");
-  Serial.println(WiFi.localIP());
+  Serial.println("Connected!");
+  Serial.print("IP address: "); Serial.println(WiFi.localIP());
+  Serial.print("Hostname: "); Serial.println(WiFi.hostname());
 
   // Update inital text with current IP
   text = text + WiFi.localIP().toString();
 
   // Set up mDNS responder:
   // - first argument is the host name
-  if (!MDNS.begin("esp8266")) {
+  if (!MDNS.begin(WiFi.hostname())) {
     Serial.println("Error setting up MDNS responder!");
     haltOnError();
   }
@@ -151,18 +158,36 @@ void setup() {
   matrix.fillScreen(HIGH);
   matrix.write();
 
+  // Initialize the resetButton
+  resetButton.begin();
+  resetButton.onPressed(onResetPressed);
+
   delay(2000);
   digitalWrite(pinLED, HIGH);
   Serial.println("Setup completed");
 }
 
+/************************( Halt on error and blink )***************************************/
 void haltOnError() {
   while (1) {
-    digitalWrite(pinLED, HIGH);
-    delay(1000);
     digitalWrite(pinLED, LOW);
     delay(1000);
+    digitalWrite(pinLED, HIGH);
+    delay(1000);
   }
+}
+
+/************************( Reset WiFi Manager by FlashButton )*****************************/
+void onResetPressed() {
+  Serial.println("Reset has been pressed!");
+  digitalWrite(pinLED, LOW);
+  delay(5000);
+
+  // Reset settings - wipe credentials
+  wm.resetSettings();
+
+  // Restart ESP8266
+  ESP.restart();
 }
 
 /************************( Show HTML page )************************************************/
@@ -212,11 +237,14 @@ void handleNotFound() {
   server.send(404, "text/html", notFoundPage);
 }
 
-void handleNetwork() {
+/************************( Check for client requests )***************************************/
+void checkClients() {
   // Advertise the service via mDNS
   MDNS.update();
-  // Check for new incoming data
+  // Check for new incoming data from web server
   server.handleClient();
+  // Check for button press
+  resetButton.read();
 }
 
 /************************( Function for scrolling the text )*******************************/
@@ -235,8 +263,8 @@ void scrolling() {
       if (letter < text.length()) {
         // Draw letter
         matrix.drawChar(x, y, text[letter], HIGH, LOW, fontSize);
-        // Response to clients
-        handleNetwork();
+        // Check clients
+        checkClients();
       }
       letter--;
       x -= width;
@@ -250,8 +278,8 @@ void scrolling() {
 
 /************************( Main loop )*****************************************************/
 void loop() {
-  // Response to clients
-  handleNetwork();
+  // Check clients
+  checkClients();
 
   // TODO implement different displayTypes
   scrolling();
