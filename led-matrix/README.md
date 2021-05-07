@@ -13,7 +13,7 @@ In order not to encode the WLAN access data hard in the source code, I use the W
 ## Quickstart
 
 For the ArduinoIDE an additional library is needed. This library "arduino-Max72xxPanel" can be downloaded [here][4]. The other dependencies are loaded via the library manager. 
-Load the [source code][7] in the Arduino IDE and update your ESP8266. 
+Load the [source code][5] in the Arduino IDE and update your ESP8266. 
 
 ## Connecting the MAX7219
 
