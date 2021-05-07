@@ -90,7 +90,7 @@ void setup() {
   WiFiManager wm;
 
   // Reset settings - wipe credentials for testing
-  wm.resetSettings();
+  //wm.resetSettings();
 
   // Automatically connect using saved credentials,
   // if connection fails, it starts an access point
