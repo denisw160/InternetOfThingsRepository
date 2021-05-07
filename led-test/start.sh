@@ -5,5 +5,5 @@
 # The schematic can be found in the folder doc.
 #
 
-echo Starting LEDTest ...
-python src/ledtest.py
+echo Starting LED-Test ...
+python src/led-test.py
